@@ -528,6 +528,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .format-extra span { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 .format-extra h4 { margin-top: 1.7rem; font-family: var(--serif); font-size: clamp(1.45rem, 2vw, 1.9rem); font-weight: 300; line-height: 1.05; }
 .format-extra p { max-width: 31ch; margin-top: 0.65rem; font-size: 0.84rem; line-height: 1.55; color: var(--muted); }
+.format-extra__link { display: inline-flex; gap: 0.35rem; margin-top: 1rem; padding-bottom: 0.14rem; border-bottom: 1px solid rgba(11, 31, 26, 0.32); font-size: 0.74rem; letter-spacing: 0.03em; }
+.format-extra__link:hover { border-color: var(--ink); }
 
 /* work */
 .work { background: var(--forest-deep); color: var(--paper); }
