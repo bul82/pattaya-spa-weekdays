@@ -2,11 +2,17 @@
   'use strict';
 
   var header = document.querySelector('.site-header');
+  var progress = document.querySelector('.scroll-progress span');
   var toggle = document.querySelector('.menu-toggle');
   var menu = document.getElementById('mobile-menu');
 
   function onScroll() {
     if (header) header.classList.toggle('is-scrolled', (window.scrollY || 0) > 36);
+    if (progress) {
+      var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      var ratio = maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
+      progress.style.transform = 'scaleX(' + ratio + ')';
+    }
   }
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -80,6 +86,11 @@
   var video = document.querySelector('.hero-video');
   var videoToggle = document.querySelector('.video-toggle');
   if (video && videoToggle) {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.pause();
+      videoToggle.setAttribute('aria-pressed', 'true');
+      videoToggle.setAttribute('aria-label', 'Воспроизвести видео');
+    }
     videoToggle.addEventListener('click', function () {
       if (video.paused) {
         video.play().catch(function () {});
@@ -123,16 +134,26 @@
   }
 
   var format = document.getElementById('format');
+  var nights = document.getElementById('nights');
   document.querySelectorAll('[data-format]').forEach(function (link) {
     link.addEventListener('click', function () {
       if (format) format.value = link.getAttribute('data-format');
+      var requestedNights = link.getAttribute('data-nights');
+      if (nights && requestedNights) nights.value = requestedNights;
       setMenu(false);
     });
   });
+  if (format) {
+    format.addEventListener('change', function () {
+      var option = format.options[format.selectedIndex];
+      var requestedNights = option && option.getAttribute('data-nights');
+      if (nights && requestedNights) nights.value = requestedNights;
+    });
+  }
 
   var form = document.getElementById('booking-form');
   var note = document.getElementById('form-note');
-  var defaultNote = 'Откроется почтовая программа. Проверьте текст и отправьте письмо.';
+  var defaultNote = 'Откроется WhatsApp с готовым сообщением. Проверьте его и отправьте.';
   var arrival = document.getElementById('arrival');
   var guestName = document.getElementById('guest-name');
   var contact = document.getElementById('contact');
@@ -185,20 +206,25 @@
 
       var parts = arrival.value.split('-');
       var dateText = parts[2] + '.' + parts[1] + '.' + parts[0];
+      var nightsValue = document.getElementById('nights').value;
+      var nightsText = nightsValue === 'day' ? 'Без ночёвки' : (nightsValue === '7plus' ? '7+' : nightsValue);
       var lines = [
         'Здравствуйте! Хочу забронировать будни в Pattaya SPA Chundzha.',
         'Имя: ' + guestName.value.trim(),
         'Контакт: ' + contact.value.trim(),
         'Дата заезда: ' + dateText,
-        'Ночей: ' + document.getElementById('nights').value,
+        'Ночей: ' + nightsText,
         'Гостей: ' + document.getElementById('guests').value,
         'Формат: ' + document.getElementById('format').value
       ];
       if (comment && comment.value.trim()) lines.push('Важно учесть: ' + comment.value.trim());
 
-      note.textContent = 'Открываем почтовую программу. Если она не открылась, напишите на info@pattayaspa.kz или позвоните по номеру +7 707 842 41 19.';
+      note.textContent = 'Открываем WhatsApp с готовым сообщением. Если он не открылся, напишите на info@pattayaspa.kz или позвоните: +7 707 842 41 19.';
       note.classList.remove('is-error');
-      window.location.href = 'mailto:info@pattayaspa.kz?subject=' + encodeURIComponent('Запрос на будни · Pattaya SPA Chundzha') + '&body=' + encodeURIComponent(lines.join('\n'));
+      var waUrl = 'https://wa.me/77078424119?text=' + encodeURIComponent(lines.join('\n'));
+      var waWindow = window.open(waUrl, '_blank');
+      if (waWindow) waWindow.opener = null;
+      if (!waWindow) window.location.href = waUrl;
     });
 
     form.querySelectorAll('input, textarea, select').forEach(function (field) {
