@@ -773,7 +773,7 @@ html.reveal-on .reveal:nth-child(4) { transition-delay: 0.21s; }
   .hero-actions { align-items: stretch; }
   .hero-actions .btn { width: 100%; }
   .hero-actions .link-line { width: fit-content; }
-  .hero-note { font-size: 0.7rem; line-height: 1.45; }
+  .hero-note { font-size: 0.75rem; line-height: 1.45; }
   .hero-media { position: absolute; inset: 0; height: 100%; min-height: 0; margin: 0; border: 0; }
   .hero-video { object-position: 48% center; }
   .hero-media::after { background: linear-gradient(180deg, rgba(7, 29, 24, 0.5) 0%, rgba(7, 29, 24, 0.08) 28%, rgba(7, 29, 24, 0.94) 82%, rgba(7, 29, 24, 0.98) 100%); }
