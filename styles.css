@@ -762,6 +762,14 @@ html.reveal-on .reveal:nth-child(4) { transition-delay: 0.21s; }
 
 @media (max-width: 640px) {
   :root { --pad: 1.15rem; }
+  .teaser-facts span,
+  .recovery-media figcaption,
+  .recovery-water__facts small,
+  .water-strip__numbers dt,
+  .recovery-water__note,
+  .route-facts span { font-size: 0.75rem; line-height: 1.55; }
+  .recovery-water__note { color: rgba(242, 237, 227, 0.72); }
+  .ritual-list dt { font-size: 0.75rem; }
   .brand-mark { width: 2.15rem; height: 2.15rem; font-size: 1.15rem; }
   .brand-name { font-size: 1.08rem; }
   .brand-place { font-size: 0.68rem; }
