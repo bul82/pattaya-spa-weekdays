@@ -140,6 +140,7 @@
       if (format) format.value = link.getAttribute('data-format');
       var requestedNights = link.getAttribute('data-nights');
       if (nights && requestedNights) nights.value = requestedNights;
+      if (format) format.dispatchEvent(new Event('change', { bubbles: true }));
       setMenu(false);
     });
   });
@@ -149,6 +150,32 @@
       var requestedNights = option && option.getAttribute('data-nights');
       if (nights && requestedNights) nights.value = requestedNights;
     });
+  }
+
+  // Events use the same request form. Surface the dedicated CTA when that
+  // scenario is selected instead of silently sending an ordinary stay request.
+  var formatSelect = document.getElementById('format');
+  if (formatSelect) {
+    var syncRequestNote = function () {
+      var noteEl = document.getElementById('form-note');
+      var submit = document.querySelector('.form-submit');
+      if (!noteEl) return;
+      var isEvent = formatSelect.value === 'Событие в отеле';
+      if (submit && !submit.dataset.baseLabel) submit.dataset.baseLabel = submit.innerHTML;
+      if (submit) submit.innerHTML = isEvent ? 'Запросить событие <span aria-hidden="true">↗</span>' : submit.dataset.baseLabel;
+      if (noteEl && !noteEl.classList.contains('is-error')) noteEl.textContent = isEvent ? 'Откроется WhatsApp с запросом на событие. Проверьте состав и отправьте.' : 'Откроется WhatsApp с готовым сообщением. Проверьте его и отправьте.';
+      var arrivalLabel = document.getElementById('arrival-label');
+      var nightsLabel = document.getElementById('nights-label');
+      if (arrivalLabel) arrivalLabel.textContent = isEvent ? 'Дата события' : 'Дата заезда';
+      if (nightsLabel) nightsLabel.textContent = isEvent ? 'Продолжительность' : 'Ночей';
+      var nightsSelect = document.getElementById('nights');
+      if (nightsSelect) {
+        var dayOption = Array.from(nightsSelect.options).find(function (o) { return o.value === 'day'; });
+        if (dayOption) dayOption.textContent = isEvent ? 'Один день' : 'Без ночёвки';
+      }
+    };
+    formatSelect.addEventListener('change', syncRequestNote);
+    syncRequestNote();
   }
 
   var form = document.getElementById('booking-form');
@@ -207,15 +234,18 @@
       var parts = arrival.value.split('-');
       var dateText = parts[2] + '.' + parts[1] + '.' + parts[0];
       var nightsValue = document.getElementById('nights').value;
-      var nightsText = nightsValue === 'day' ? 'Без ночёвки' : (nightsValue === '7plus' ? '7+' : nightsValue);
+      var isEventRequest = document.getElementById('format').value === 'Событие в отеле';
+      var nightsText = nightsValue === 'day' ? (isEventRequest ? 'Один день' : 'Без ночёвки') : (nightsValue === '7plus' ? '7+' : nightsValue);
+      var dateLabel = isEventRequest ? 'Дата события' : 'Дата заезда';
+      var requestLabel = isEventRequest ? 'Событие' : 'Сценарий';
       var lines = [
-        'Здравствуйте! Хочу забронировать будни в Pattaya SPA Chundzha.',
+        isEventRequest ? 'Здравствуйте! Хочу обсудить событие в Pattaya SPA Chundzha.' : 'Здравствуйте! Хочу обсудить поездку в Pattaya SPA Chundzha.',
         'Имя: ' + guestName.value.trim(),
         'Контакт: ' + contact.value.trim(),
-        'Дата заезда: ' + dateText,
-        'Ночей: ' + nightsText,
+        dateLabel + ': ' + dateText,
+        (isEventRequest ? 'Продолжительность: ' : 'Ночей: ') + nightsText,
         'Гостей: ' + document.getElementById('guests').value,
-        'Формат: ' + document.getElementById('format').value
+        requestLabel + ': ' + document.getElementById('format').value
       ];
       if (comment && comment.value.trim()) lines.push('Важно учесть: ' + comment.value.trim());
 
